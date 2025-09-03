@@ -1,0 +1,15 @@
+# Node modules
+node_modules/
+
+# OS / editor files
+.DS_Store
+*.log
+*.swp
+*.env
+
+# Data folder (GeoTIFF uploads & outputs)
+data/
+
+# Build / dist folders
+/web/dist
+/api/dist
