@@ -1,0 +1,123 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Critical: Ensure Leaflet map container is visible and protected from Tailwind reset */
+.leaflet-container {
+    height: 100% !important;
+    width: 100% !important;
+    background: #f8f9fa !important;
+    z-index: 1;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+/* Specific styling for the split-map container */
+#split-map {
+    height: 384px !important;
+    min-height: 384px !important;
+    width: 100% !important;
+    background: #f8f9fa !important;
+    position: relative !important;
+}
+
+#split-map.leaflet-container {
+    height: 100% !important;
+    width: 100% !important;
+}
+
+/* Override Tailwind's box-sizing for Leaflet */
+.leaflet-container *,
+.leaflet-container *::before,
+.leaflet-container *::after {
+    box-sizing: content-box !important;
+}
+
+/* Ensure Leaflet tiles are visible */
+.leaflet-tile {
+    display: block !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+/* Fix Leaflet map pane */
+.leaflet-map-pane {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+}
+
+/* Fix Leaflet tile pane */
+.leaflet-tile-pane {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+}
+
+/* Fix Leaflet controls */
+.leaflet-control-container {
+    z-index: 1000;
+    position: absolute !important;
+}
+
+.leaflet-control-zoom {
+    background: white !important;
+    border: 2px solid rgba(0, 0, 0, 0.2) !important;
+    border-radius: 5px !important;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4) !important;
+}
+
+.leaflet-control-zoom a {
+    background: white !important;
+    color: #333 !important;
+    text-decoration: none !important;
+    display: block !important;
+    width: 26px !important;
+    height: 26px !important;
+    line-height: 26px !important;
+    text-align: center !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+}
+
+.leaflet-control-zoom a:hover {
+    background: #f4f4f4 !important;
+}
+
+/* Fix popup styles */
+.leaflet-popup-content-wrapper {
+    background: white !important;
+    border-radius: 10px !important;
+    box-shadow: 0 3px 14px rgba(0, 0, 0, 0.4) !important;
+    padding: 1px !important;
+}
+
+.leaflet-popup-tip {
+    background: white !important;
+}
+
+/* Ensure map attribution is visible */
+.leaflet-control-attribution {
+    background: rgba(255, 255, 255, 0.8) !important;
+    font-size: 11px !important;
+    color: #333 !important;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}

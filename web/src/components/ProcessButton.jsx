@@ -16,14 +16,10 @@ export default function ProcessButton({ disabled, onClick, status }) {
     <button
       disabled={disabled}
       onClick={onClick}
-      style={{
-        padding: "0.5rem 1rem",
-        backgroundColor: disabled ? "#ccc" : "#007bff",
-        color: "white",
-        border: "none",
-        borderRadius: "4px",
-        cursor: disabled ? "not-allowed" : "pointer"
-      }}
+      className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 ${disabled
+          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+          : "bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-sm hover:shadow-md"
+        }`}
     >
       {getButtonText()}
     </button>
