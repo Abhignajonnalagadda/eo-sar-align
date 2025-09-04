@@ -53,7 +53,14 @@ app.post("/api/jobs", async (req, res) => {
   const jobDir = path.join(OUTPUT_DIR, jobId);
   fs.ensureDirSync(jobDir);
 
-  let jobs = await fs.readJson(JOBS_FILE);
+  let jobs;
+  try {
+    jobs = await fs.readJson(JOBS_FILE);
+  } catch (error) {
+    console.log("Jobs file is empty or invalid, initializing with empty array");
+    jobs = [];
+  }
+  
   const newJob = {
     jobId,
     status: "Pending",
@@ -80,20 +87,48 @@ app.post("/api/jobs", async (req, res) => {
     jobDir,
   ]);
 
+  let workerOutput = "";
+  let workerError = "";
+
+  worker.stdout.on("data", (data) => {
+    workerOutput += data.toString();
+    console.log(`Worker stdout: ${data}`);
+  });
+
+  worker.stderr.on("data", (data) => {
+    workerError += data.toString();
+    console.error(`Worker stderr: ${data}`);
+  });
+
   worker.on("exit", async (code) => {
-    let jobs = await fs.readJson(JOBS_FILE);
-    const job = jobs.find((j) => j.jobId === jobId);
-    if (code === 0) {
-      job.status = "Done";
-      job.outputs = {
-        imageAUrl: `/data/outputs/${jobId}/A_clipped.tif`,
-        imageBUrl: `/data/outputs/${jobId}/B_clipped_aligned.tif`,
-      };
-    } else {
-      job.status = "Error";
-      job.error = `Worker exited with code ${code}`;
+    console.log(`Worker exited with code ${code}`);
+    console.log(`Worker output: ${workerOutput}`);
+    if (workerError) {
+      console.error(`Worker error: ${workerError}`);
     }
-    await fs.writeJson(JOBS_FILE, jobs);
+
+    let jobs;
+    try {
+      jobs = await fs.readJson(JOBS_FILE);
+    } catch (error) {
+      console.log("Jobs file is empty or invalid, initializing with empty array");
+      jobs = [];
+    }
+    
+    const job = jobs.find((j) => j.jobId === jobId);
+    if (job) {
+      if (code === 0) {
+        job.status = "Done";
+        job.outputs = {
+          imageAUrl: `/data/outputs/${jobId}/A_clipped.tif`,
+          imageBUrl: `/data/outputs/${jobId}/B_clipped_aligned.tif`,
+        };
+      } else {
+        job.status = "Error";
+        job.error = `Worker exited with code ${code}. Error: ${workerError}`;
+      }
+      await fs.writeJson(JOBS_FILE, jobs);
+    }
   });
 
   res.json({ jobId });
@@ -102,7 +137,14 @@ app.post("/api/jobs", async (req, res) => {
 // 3. Get Job Status
 app.get("/api/jobs/:jobId", async (req, res) => {
   const { jobId } = req.params;
-  const jobs = await fs.readJson(JOBS_FILE);
+  let jobs;
+  try {
+    jobs = await fs.readJson(JOBS_FILE);
+  } catch (error) {
+    console.log("Jobs file is empty or invalid, initializing with empty array");
+    jobs = [];
+  }
+  
   const job = jobs.find((j) => j.jobId === jobId);
   if (!job) return res.status(404).json({ error: "Job not found" });
   res.json(job);
