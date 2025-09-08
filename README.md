@@ -1,26 +1,56 @@
 # EO/SAR Split-View Map with AOI Clip & Align
 
-A full-stack web application for processing and aligning Earth Observation (EO) and Synthetic Aperture Radar (SAR) satellite imagery. Users can upload two GeoTIFF images, draw an Area of Interest (AOI), and process them to create clipped and aligned versions for comparison.
+A full-stack web application for processing and aligning Earth Observation (EO) and Synthetic Aperture Radar (SAR) satellite imagery. Users can upload two GeoTIFF images, draw an Area of Interest (AOI), and process them to create clipped and aligned versions for comparison using an interactive split-view map.
 
 ## Features
 
-- **Split-view Map**: Side-by-side visualization of two GeoTIFF images using Leaflet
-- **AOI Selection**: Interactive drawing of Area of Interest rectangles on the map
-- **Image Processing**: Automatic clipping and alignment of images using Python backend
-- **Real-time Status**: Job status tracking with polling updates
-- **Output Visualization**: Toggle between original and processed images
+### Interactive Map Interface
+- **Split-View Visualization**: Side-by-side comparison of two GeoTIFF images using Leaflet with `leaflet-side-by-side` plugin
+- **Interactive AOI Drawing**: Draw Area of Interest rectangles by holding Cmd/Ctrl and dragging on the map
+- **Real-time Map Updates**: Live visualization of both original and processed images
+- **Responsive Design**: Clean, modern UI with Tailwind CSS
 
-## Architecture
+### Image Processing Pipeline
+- **Automatic Clipping**: Clips both images to the specified AOI bounds using rasterio
+- **Image Alignment**: Aligns Image B to Image A using phase cross-correlation from scikit-image
+- **Coordinate System Handling**: Properly handles WGS84 to image CRS transformations
+- **Fallback Processing**: Gracefully handles alignment failures
 
-- **Frontend**: React with Vite, Leaflet for mapping, georaster for GeoTIFF handling
-- **Backend**: Node.js/Express API for file handling and job orchestration
-- **Worker**: Python with rasterio, scikit-image for image processing
-- **Containerization**: Docker Compose for easy deployment
+### Job Management
+- **Asynchronous Processing**: Background job processing with real-time status updates
+- **Job Status Tracking**: Visual status indicators (Idle, Pending, Running, Done, Error)
+- **Output Toggle**: Switch between original and processed images seamlessly
+- **Error Handling**: Comprehensive error reporting and validation
 
-## Quick Start
+## 🏗️ Architecture
+
+### Frontend (React + Vite)
+- **Framework**: React 19 with Vite for fast development and building
+- **Mapping**: Leaflet with `leaflet-side-by-side` for split-view functionality
+- **GeoTIFF Handling**: `georaster` and `georaster-layer-for-leaflet` for raster visualization
+- **Styling**: Tailwind CSS for responsive design
+- **HTTP Client**: Axios for API communication
+
+### Backend (Node.js + Express)
+- **API Server**: Express.js with CORS support
+- **File Handling**: Multer for multipart file uploads
+- **Job Management**: JSON-based job queue with UUID tracking
+- **File Storage**: Organized upload and output directories
+
+### Worker (Python)
+- **Image Processing**: Rasterio for GeoTIFF manipulation
+- **Alignment Algorithm**: Phase cross-correlation from scikit-image
+- **Coordinate Systems**: GDAL for CRS transformations
+- **Dependencies**: NumPy for numerical operations
+
+### Containerization
+- **Docker Compose**: Multi-service orchestration
+- **Shared Volumes**: Persistent data storage across containers
+- **Network**: Bridge network for service communication
+
+## 🚀 Quick Start
 
 ### Prerequisites
-
 - Docker and Docker Compose
 - Git
 
@@ -38,10 +68,34 @@ A full-stack web application for processing and aligning Earth Observation (EO) 
    ```
 
 3. **Access the application**:
-   - Web interface: http://localhost:3000
-   - API: http://localhost:8080
+   - **Web Interface**: http://localhost:3000
+   - **API**: http://localhost:8080
 
-## API Endpoints
+## 📖 Usage Instructions
+
+### 1. Upload Images
+- Click "Choose File" for both Image A and Image B
+- Select GeoTIFF files (.tif or .tiff)
+- Wait for upload completion (status indicators will show progress)
+
+### 2. Draw Area of Interest
+- Hold **Cmd** (Mac) or **Ctrl** (Windows/Linux)
+- Click and drag on the map to draw a rectangle
+- The AOI will be highlighted in red
+
+### 3. Process Images
+- Click "Process AOI" to start the processing job
+- Monitor the job status in real-time
+- Processing includes:
+  - Clipping both images to AOI bounds
+  - Aligning Image B to Image A using phase cross-correlation
+  - Generating output files
+
+### 4. View Results
+- Toggle "Show processed outputs" to switch between original and processed images
+- Compare the aligned results in the split-view map
+
+## 🔧 API Reference
 
 ### Upload Image
 ```http
@@ -88,84 +142,79 @@ Response: {
 }
 ```
 
-## Image Processing Pipeline
+### Get Image URL
+```http
+GET /api/images/:imageId
 
-The Python worker performs the following steps:
+Response: File stream (GeoTIFF)
+```
+
+## 🧠 Image Processing Pipeline
 
 ### 1. Image Clipping
-- Clips both input images to the specified AOI bounds
-- Handles coordinate system transformations from WGS84 to image CRS
-- Uses `rasterio.mask` for precise geometric clipping
+- **Input**: Original GeoTIFF files and AOI bounds in WGS84
+- **Process**: 
+  - Transform AOI bounds from WGS84 to image coordinate system
+  - Use `rasterio.mask` for precise geometric clipping
+  - Maintain original data types and metadata
+- **Output**: Clipped images saved as `A_clipped.tif` and `B_clipped.tif`
 
 ### 2. Image Alignment
-- Aligns Image B to Image A using **phase cross-correlation**
-- Normalizes images for better correlation matching
-- Applies affine transformation based on detected shift
-- Falls back to original image if alignment fails
-
-### Alignment Method
-
-The application uses **phase cross-correlation** from scikit-image for image registration:
-
-- **Advantages**: Robust to illumination changes, works well with different image types (EO vs SAR)
-- **Process**: 
+- **Method**: Phase cross-correlation from scikit-image
+- **Process**:
   1. Normalize both images to zero mean and unit variance
   2. Compute phase cross-correlation with upsampling for sub-pixel accuracy
   3. Apply detected translation using affine transformation
-- **Limitations**: Only handles translation, not rotation or scaling
+  4. Fall back to original clipped image if alignment fails
+- **Output**: Aligned image saved as `B_clipped_aligned.tif`
 
-## Usage Instructions
+### Alignment Algorithm Details
 
-1. **Upload Images**: Select two GeoTIFF files (Image A and Image B)
-2. **View Images**: Images appear in split-view map for comparison
-3. **Draw AOI**: Click on the map to place an Area of Interest rectangle
-4. **Process**: Click "Process AOI" to start clipping and alignment
-5. **Monitor**: Watch job status updates in real-time
-6. **View Results**: Toggle "Show processed outputs" to see aligned images
+**Phase Cross-Correlation** is used because it:
+- Is robust to illumination changes between images
+- Works well with different image types (EO vs SAR)
+- Provides sub-pixel accuracy
+- Handles translation effectively
 
-## File Structure
+**Limitations**:
+- Only handles translation, not rotation or scaling
+- Works best with similar image resolutions
+- May struggle with very different image types
+
+## 📁 Project Structure
 
 ```
 eo-sar-align/
-├── web/                 # React frontend
+├── web/                          # React frontend
 │   ├── src/
-│   │   ├── components/  # React components
-│   │   └── api.js      # API client
+│   │   ├── components/           # React components
+│   │   │   ├── SplitMap.jsx     
+│   │   │   ├── UploadPanel.jsx  # File upload interface
+│   │   │   ├── ProcessButton.jsx 
+│   │   │   ├── JobStatusChip.jsx # Status indicators
+│   │   │   └── AOISelector.jsx  # AOI selection utilities
+│   │   ├── App.jsx              # Main application component
+│   │   ├── api.js               # API client functions
+│   │   └── main.jsx             # Application entry point
 │   ├── Dockerfile
-│   └── nginx.conf
-├── api/                 # Node.js backend
-│   ├── server.js       # Express server
+│   └── nginx.conf               # Nginx configuration
+├── api/                          # Node.js backend
+│   ├── server.js                # Express server with endpoints
+│   ├── package.json
 │   └── Dockerfile
-├── worker/              # Python image processing
-│   ├── worker.py       # Main processing script
-│   ├── requirements.txt
+├── worker/                       # Python image processing
+│   ├── worker.py                # Main processing script
+│   ├── requirements.txt         # Python dependencies
 │   └── Dockerfile
-├── data/               # Shared volume (uploads/outputs)
-├── docker-compose.yml
+├── data/                        # Shared volume
+│   ├── uploads/                 # Uploaded GeoTIFF files
+│   ├── outputs/                 # Processed output files
+│   └── jobs.json               # Job queue storage
+├── docker-compose.yml           # Multi-service orchestration
 └── README.md
 ```
 
-## Known Limitations & Tradeoffs
-
-### Technical Limitations
-- **Alignment Method**: Only handles translation, not rotation or scaling
-- **File Size**: Large GeoTIFFs (>150MB) may cause browser performance issues
-- **Coordinate Systems**: Assumes AOI is in WGS84 (EPSG:4326)
-- **Image Types**: Works best with similar image types and resolutions
-
-### Performance Tradeoffs
-- **Processing Time**: Real image processing takes longer than mock operations
-- **Memory Usage**: Large images require significant memory for processing
-- **Browser Rendering**: Complex GeoTIFFs may need downsampling for smooth display
-
-### Future Improvements
-- Support for rotation and scaling in alignment
-- Feature-based alignment (SIFT/ORB) for better accuracy
-- Progressive image loading and tiling
-- Support for different coordinate systems
-- Batch processing capabilities
-
-## Development
+## 🛠️ Development
 
 ### Local Development (without Docker)
 
@@ -190,29 +239,78 @@ eo-sar-align/
    python worker.py --help
    ```
 
-### Testing with Sample Data
+## ⚠️ Known Limitations
 
-The application works with any GeoTIFF files. For testing, you can use:
-- Sentinel-2 optical imagery (EO)
-- Sentinel-1 SAR imagery
-- Landsat imagery
-- Any other GeoTIFF with proper georeferencing
+### Technical Limitations
+- **Alignment Method**: Only handles translation, not rotation or scaling
+- **File Size**: Large GeoTIFFs (>150MB) may cause browser performance issues
+- **Coordinate Systems**: Assumes AOI is in WGS84 (EPSG:4326)
+- **Image Types**: Works best with similar image types and resolutions
+- **Browser Compatibility**: Requires modern browsers with WebGL support
 
-## Troubleshooting
+### Performance Considerations
+- **Processing Time**: Real image processing takes longer than mock operations
+- **Memory Usage**: Large images require significant memory for processing
+- **Browser Rendering**: Complex GeoTIFFs may need downsampling for smooth display
+- **Network**: Large file uploads may timeout on slow connections
+
+## 🔮 Future Improvements
+
+### Enhanced Alignment
+- Support for rotation and scaling in alignment
+- Feature-based alignment (SIFT/ORB) for better accuracy
+- Multi-scale alignment for different resolutions
+
+### User Experience
+- Progressive image loading and tiling
+- Drag-and-drop file upload
+- Keyboard shortcuts for common actions
+- Undo/redo functionality for AOI drawing
+
+### Technical Enhancements
+- Support for different coordinate systems
+- Batch processing capabilities
+- Cloud storage integration
+- Real-time collaboration features
+
+## 🐛 Troubleshooting
 
 ### Common Issues
 
-1. **Images not loading**: Check file format (must be .tif/.tiff) and georeferencing
-2. **Processing fails**: Verify AOI bounds are within image extent
-3. **Alignment poor**: Images may be too different in type or resolution
-4. **Docker issues**: Ensure Docker has sufficient memory allocated
+1. **Images not loading**:
+   - Check file format (must be .tif/.tiff)
+   - Verify georeferencing is present
+   - Check browser console for errors
 
-### Logs
+2. **Processing fails**:
+   - Verify AOI bounds are within image extent
+   - Check file permissions in data directory
+   - Review worker logs for detailed error messages
 
-- **API logs**: `docker compose logs api`
-- **Worker logs**: `docker compose logs worker`
-- **Web logs**: `docker compose logs web`
+3. **Alignment poor**:
+   - Images may be too different in type or resolution
+   - Try with smaller AOI areas
+   - Check if images have sufficient overlap
 
-## License
 
-This project is for educational and research purposes.
+### Debugging
+
+**View logs**:
+```bash
+# All services
+docker compose logs
+
+# Specific service
+docker compose logs web
+docker compose logs api
+docker compose logs worker
+```
+
+**Check data directory**:
+```bash
+# Verify uploaded files
+ls -la data/uploads/
+
+# Check processed outputs
+ls -la data/outputs/
+```
