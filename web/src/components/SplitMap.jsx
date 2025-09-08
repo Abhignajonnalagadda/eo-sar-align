@@ -329,25 +329,25 @@ export default function SplitMap({ images, processedImages, aoi, onAOIChange }) 
     }, [aoi]);
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-2">
             <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Split-View Map</h3>
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <div className="flex items-start">
-                        <svg className="w-5 h-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                        </svg>
-                        <div className="text-sm text-blue-800">
-                            <p className="font-medium mb-1">Draw Area of Interest (AOI)</p>
-                            <p>
-                                Hold <kbd className="px-2 py-1 bg-blue-100 border border-blue-300 rounded text-xs font-mono">Cmd</kbd> (Mac) or <kbd className="px-2 py-1 bg-blue-100 border border-blue-300 rounded text-xs font-mono">Ctrl</kbd> (Windows/Linux) and drag on the map to draw a rectangle for processing.
-                            </p>
-                        </div>
-                    </div>
-                </div>
+                <h3 className="text-base font-semibold text-gray-900 mb-1">Split-View Map</h3>
+
             </div>
             <div className="relative">
-                <div id="split-map" className="w-full h-96 rounded-lg border border-gray-300 overflow-hidden shadow-sm" style={{ minHeight: '384px' }}></div>
+                <div id="split-map" className="w-full h-64 rounded-lg border border-gray-300 overflow-hidden shadow-sm" style={{ minHeight: '256px' }}></div>
+            </div>
+            <div className="p-2">
+                <div className="flex items-center">
+                    <svg className="w-4 h-4 text-blue-600 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    </svg>
+                    <div className="text-xs text-blue-800">
+                        <p>
+                            Hold <kbd className="px-1 py-0.5 bg-blue-100 border border-blue-300 rounded text-xs font-mono">Cmd</kbd> (Mac) or <kbd className="px-1 py-0.5 bg-blue-100 border border-blue-300 rounded text-xs font-mono">Ctrl</kbd> (Windows/Linux) and drag on the map to draw a rectangle for processing.
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     );

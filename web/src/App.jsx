@@ -86,7 +86,6 @@ export default function App() {
                 {/* Header */}
                 <div className="text-center">
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">EO/SAR Split-View Map</h1>
-                    <p className="text-gray-600">Upload GeoTIFF images and process Area of Interest (AOI) for alignment analysis</p>
                 </div>
 
                 {/* Error Alert */}
@@ -116,43 +115,8 @@ export default function App() {
                     />
                 </div>
 
-                {/* AOI Controls */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <div className="flex flex-wrap items-center gap-4">
-                        <button
-                            onClick={() => {
-                                console.log("Setting test AOI");
-                                setAOI({
-                                    north: 20.5,
-                                    south: 19.5,
-                                    east: 79.5,
-                                    west: 78.5
-                                });
-                            }}
-                            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 font-medium"
-                        >
-                            Set Test AOI
-                        </button>
-
-                        {aoi && (
-                            <div className="flex items-center gap-3 text-sm text-gray-600">
-                                <span className="font-medium">AOI Selected:</span>
-                                <span className="font-mono bg-gray-100 px-2 py-1 rounded">
-                                    N{aoi.north.toFixed(4)}, S{aoi.south.toFixed(4)}, E{aoi.east.toFixed(4)}, W{aoi.west.toFixed(4)}
-                                </span>
-                                <button
-                                    onClick={() => setAOI(null)}
-                                    className="px-3 py-1 text-xs bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors duration-200"
-                                >
-                                    Reset AOI
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
                 {/* Processing Controls */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
                     <div className="flex flex-wrap items-center gap-4">
                         <ProcessButton
                             onClick={handleProcess}

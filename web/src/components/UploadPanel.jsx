@@ -52,9 +52,9 @@ export default function UploadPanel({ setImages, setImageIds }) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">Upload GeoTIFF Images</h2>
+        <h2 className="text-xl font-semibold text-gray-900 mb-1">Upload GeoTIFF Images</h2>
         <p className="text-sm text-gray-600">Select two GeoTIFF files for comparison and alignment analysis</p>
       </div>
 
