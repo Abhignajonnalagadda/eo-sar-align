@@ -2,6 +2,10 @@
 
 A full-stack web application for processing and aligning Earth Observation (EO) and Synthetic Aperture Radar (SAR) satellite imagery. Users can upload two GeoTIFF images, draw an Area of Interest (AOI), and process them to create clipped and aligned versions for comparison using an interactive split-view map.
 
+## Demo
+![Screen Recording 2025-09-08 at 10 48 59 AM](https://github.com/user-attachments/assets/b0ed1852-125a-4527-ab50-221e75ba366f)
+
+
 ## Features
 
 ### Interactive Map Interface
